@@ -1,0 +1,14 @@
+<p-overlayPanel #op [dismissable]="true" [showCloseIcon]="true">
+  <ng-template pTemplate>
+    <p-panel header="Zoomchat">
+      <div style="height: 400px; width: 200px">
+        <p-card>message</p-card>
+      </div>
+    </p-panel>
+  </ng-template>
+</p-overlayPanel>
+<button type="text" pButton label="Basic" (click)="op.toggle($event); openChat()">
+  <div [innerHtml]="popupText" style="width: 180px;">
+
+  </div>
+</button>
