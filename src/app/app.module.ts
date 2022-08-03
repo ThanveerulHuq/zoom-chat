@@ -11,6 +11,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ToastModule } from 'primeng/toast';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [AppComponent, ZoomchatComponent],
@@ -24,6 +25,9 @@ import { CardModule } from 'primeng/card';
     HttpClientModule,
     PanelModule,
     CardModule,
+    RouterModule.forRoot([
+      { path: 'fe-assignment', component: ZoomchatComponent },
+    ]),
   ],
   providers: [],
   bootstrap: [AppComponent],
