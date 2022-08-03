@@ -46,7 +46,7 @@ export class FeedService {
       {
         channelName,
         senderId,
-        message: { lastMessageTimeStamp: new Date().getMilliseconds() },
+        message: { lastMessageTimeStamp: new Date().getTime() },
       },
       'presence-insentstaging-widget-user-' + senderId
     );
