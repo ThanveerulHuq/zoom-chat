@@ -2,7 +2,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { AuthorizeResponse, SessionResponse } from '../models/chat.model';
+import {
+  AuthorizeResponse,
+  ChannelInfo,
+  SessionResponse,
+} from '../models/chat.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +17,7 @@ export class ChatService {
     environment.apiUrl + '/getuser?url=' + window.location.href;
   private authorizeURL: string =
     environment.apiUrl + '/pusher/presence/auth/visitor?userid=';
+  private channelInfoURL: string = environment.apiUrl + '/user/channels/';
 
   getUserSession(): Observable<SessionResponse> {
     const headers: HttpHeaders = new HttpHeaders({
@@ -36,5 +41,15 @@ export class ChatService {
       'socket_id=401347.8253087&channel_name=' + channelName,
       { headers }
     );
+  }
+
+  getChannelInfo(channel: string, userid: string): Observable<ChannelInfo> {
+    const headers: HttpHeaders = new HttpHeaders({
+      authorization: 'Bearer 2LejamM1576236866754',
+      userid,
+    });
+    return this.httpClient.get<ChannelInfo>(this.channelInfoURL + channel, {
+      headers,
+    });
   }
 }

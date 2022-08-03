@@ -106,3 +106,61 @@ export interface AuthorizeResponse {
   auth: string;
   channel_data: string;
 }
+
+export interface State {
+  text: string;
+  sid: string;
+}
+
+export interface Buttons {
+  fields: string[];
+  states: State[];
+  min: number;
+  max: number;
+  key: string;
+  redirectToState: boolean;
+}
+
+export interface Sender {
+  id: string;
+  name: string;
+  img: string;
+  timestamp: number;
+}
+
+export interface ChannelInfo {
+  channelId: string;
+  messages: Message[];
+  end: boolean;
+  botActive: boolean;
+  showTypingIndicator: boolean;
+  members: any[];
+  sender: Sender;
+  input: boolean;
+  eventType: string;
+  messageTimestamp: number;
+}
+
+export interface Message {
+  type: string;
+  text: string;
+  isEditorActive?: boolean;
+  pause?: number;
+  id?: string;
+  buttons?: Button;
+  key?: string;
+}
+
+export interface ButtonState {
+  text: string;
+  sid: string;
+}
+
+export interface Button {
+  fields: string[];
+  states: ButtonState[];
+  min: number;
+  max: number;
+  key: string;
+  redirectToState: boolean;
+}

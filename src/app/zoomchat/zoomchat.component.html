@@ -2,7 +2,15 @@
   <ng-template pTemplate>
     <p-panel header="Zoomchat">
       <div style="height: 400px; width: 200px">
-        <p-card>message</p-card>
+        <ng-container *ngFor="let message of messages">
+          <ng-container *ngIf="message.type === 'text'">
+            <p [innerHtml]="message.text"></p>
+          </ng-container>
+          <ng-container *ngIf="message.type === 'button'">
+            <button (click)="responseClicked(message?.key, message.text)">{{message.text}}</button>
+          </ng-container>
+        </ng-container>
+
       </div>
     </p-panel>
   </ng-template>

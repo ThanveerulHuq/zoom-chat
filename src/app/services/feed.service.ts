@@ -4,12 +4,13 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import Pusher from 'pusher-js';
 import { environment } from 'src/environments/environment';
+import { ChannelInfo, Message } from '../models/chat.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeedService {
-  private subject: Subject<string> = new Subject<string>();
+  private subject: Subject<ChannelInfo> = new Subject<ChannelInfo>();
 
   private pusherClient!: Pusher;
 
@@ -31,22 +32,29 @@ export class FeedService {
       'presence-insentstaging-widget-user-' + userId
     );
 
-    channel.bind('server-message', (data: string) => {
+    channel.bind('server-message', (data: ChannelInfo) => {
+      console.log(data, 'data logged');
       this.subject.next(data);
     });
   }
 
-  getFeedItems(): Observable<string> {
+  getFeedItems(): Observable<ChannelInfo> {
     return this.subject.asObservable();
   }
 
-  publishEvent(channelName: string, senderId: string) {
+  publishEvent(
+    channelName: string,
+    senderId: string,
+    message: any,
+    display?: any
+  ) {
     this.pusherClient.send_event(
       'client-widget-message',
       {
         channelName,
         senderId,
-        message: { lastMessageTimeStamp: new Date().getTime() },
+        message,
+        display,
       },
       'presence-insentstaging-widget-user-' + senderId
     );
