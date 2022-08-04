@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { switchMap, tap, timer } from 'rxjs';
 import { ChannelInfo, Message, SessionResponse } from '../models/chat.model';
 import { ChatService } from '../services/chat.service';
 import { FeedService } from '../services/feed.service';
@@ -27,37 +28,44 @@ export class ZoomchatComponent implements OnInit {
       this.userId = response.user.id;
       this.feedService.subscribeToSocket(response.user.id);
     });
-    this.feedService.getFeedItems().subscribe((res: ChannelInfo) => {
-      res.messages.forEach((message) => {
-        if (message.buttons) {
-          this.messages.push(
-            ...message.buttons.states.map((state) => ({
-              text: state.text,
-              key: message.buttons?.key,
-              type: 'button',
-            }))
-          );
-        } else {
-          this.messages.push(message);
-        }
+    this.feedService
+      .getFeedItems()
+      .pipe(tap((res) => (this.lastMessageTimeStamp = res.messageTimestamp)))
+      .subscribe((channelInfo: ChannelInfo) => {
+        channelInfo.messages.forEach((message) => {
+          if (message.buttons) {
+            this.messages.push(
+              ...message.buttons.states.map((state) => ({
+                text: state.text,
+                key: message.buttons?.key,
+                type: 'button',
+              }))
+            );
+          } else if (message.input) {
+            this.messages.push(
+              ...message.input.map((input) => ({
+                type: input.type,
+                key: input.key,
+                text: input.name,
+              }))
+            );
+          }
+          if (message.type === 'text') {
+            this.sendLastMessageTimeStamp(message.pause);
+            this.messages.push(message);
+          }
+        });
       });
-      // this.messages.push(...res.messages);
-      this.lastMessageTimeStamp = res.messageTimestamp;
-    });
   }
 
   openChat() {
-    // this.chatService
-    //   .authorizeSession(this.userId, this.channelId)
-    //   .subscribe(console.log);
+    if (this.lastMessageTimeStamp) return;
     this.chatService
       .getChannelInfo(this.channelId, this.userId)
-      .subscribe((res: ChannelInfo) => {
-        this.lastMessageTimeStamp = res.messageTimestamp;
-        this.messages.push(...res.messages);
-        this.feedService.publishEvent(this.channelId, this.userId, {
-          lastMessageTimeStamp: this.lastMessageTimeStamp,
-        });
+      .pipe(tap((res) => (this.lastMessageTimeStamp = res.messageTimestamp)))
+      .subscribe((res) => {
+        this.sendLastMessageTimeStamp(res.messages[0].pause);
+        this.messages.push(res.messages[0]);
       });
   }
 
@@ -65,7 +73,7 @@ export class ZoomchatComponent implements OnInit {
     const response: Record<string, string[]> = {};
     response[key as string] = [value];
     const payload = {
-      message: response,
+      ...response,
       lastMessageTimeStamp: this.lastMessageTimeStamp,
     };
     const display = {
@@ -84,6 +92,49 @@ export class ZoomchatComponent implements OnInit {
       this.channelId,
       this.userId,
       payload,
+      display
+    );
+  }
+
+  sendLastMessageTimeStamp(time: number = 0): void {
+    timer(time)
+      .pipe(
+        tap((_) =>
+          this.feedService.publishEvent(this.channelId, this.userId, {
+            lastMessageTimeStamp: this.lastMessageTimeStamp,
+          })
+        )
+      )
+      .subscribe();
+  }
+
+  onInput(event: any, message: Message) {
+    const reqMessage = {
+      email: event.target.value,
+      lastMessageTimeStamp: this.lastMessageTimeStamp,
+    };
+    const display = {
+      img: 'https://staging-uploads.insent.ai/insentstaging/logo-insentstaging-1657874092041?1657874092120',
+      name: 'Discuter123',
+      lastMessageTimeStamp: this.lastMessageTimeStamp,
+      lead: false,
+      time: new Date().getTime(),
+      type: 'input',
+      userId: 'bot',
+      input: {
+        key: message.key,
+        type: message.type,
+        text: message.text,
+        validateDomains: true,
+        value: event.target.value,
+        disabled: true,
+      },
+      channelId: this.channelId,
+    };
+    this.feedService.publishEvent(
+      this.channelId,
+      this.userId,
+      reqMessage,
       display
     );
   }

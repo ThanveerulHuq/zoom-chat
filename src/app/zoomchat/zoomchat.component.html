@@ -9,6 +9,10 @@
           <ng-container *ngIf="message.type === 'button'">
             <button (click)="responseClicked(message?.key, message.text)">{{message.text}}</button>
           </ng-container>
+          <ng-container *ngIf="message.type === 'email'">
+            <label for="message.text">{{message.text}}</label>
+            <input (keyup.enter)="onInput($event, message)">
+          </ng-container>
         </ng-container>
 
       </div>

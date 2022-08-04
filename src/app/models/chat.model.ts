@@ -149,6 +149,8 @@ export interface Message {
   id?: string;
   buttons?: Button;
   key?: string;
+  input?: Input[];
+  name?: string;
 }
 
 export interface ButtonState {
@@ -163,4 +165,13 @@ export interface Button {
   max: number;
   key: string;
   redirectToState: boolean;
+}
+export interface Input {
+  name: string;
+  key: string;
+  type: string;
+  text: string;
+  validateDomains: boolean;
+  value: string;
+  disabled: boolean;
 }
