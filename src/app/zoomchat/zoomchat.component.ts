@@ -49,8 +49,7 @@ export class ZoomchatComponent implements OnInit {
                 text: input.name,
               }))
             );
-          }
-          if (message.type === 'text') {
+          } else if (message.type === 'text') {
             this.sendLastMessageTimeStamp(message.pause);
             this.messages.push(message);
           }

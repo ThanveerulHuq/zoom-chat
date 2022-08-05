@@ -1,17 +1,18 @@
 <p-overlayPanel #op [dismissable]="true" [showCloseIcon]="true">
   <ng-template pTemplate>
     <p-panel header="Zoomchat">
-      <div style="height: 400px; width: 200px">
+      <div style="height: 400px; width: 300px; overflow-y: scroll;">
         <ng-container *ngFor="let message of messages">
           <ng-container *ngIf="message.type === 'text'">
             <p [innerHtml]="message.text"></p>
           </ng-container>
           <ng-container *ngIf="message.type === 'button'">
-            <button (click)="responseClicked(message?.key, message.text)">{{message.text}}</button>
+            <button pButton class="p-button-raised p-button-info"
+              (click)="responseClicked(message?.key, message.text)">{{message.text}}</button>
           </ng-container>
-          <ng-container *ngIf="message.type === 'email'">
+          <ng-container *ngIf="message.type === 'email' || message.type === 'plain'">
             <label for="message.text">{{message.text}}</label>
-            <input (keyup.enter)="onInput($event, message)">
+            <input [type]="message.type" pInputText (keyup.enter)="onInput($event, message)" pInputText>
           </ng-container>
         </ng-container>
 
@@ -19,7 +20,7 @@
     </p-panel>
   </ng-template>
 </p-overlayPanel>
-<button type="text" pButton label="Basic" (click)="op.toggle($event); openChat()">
+<button *ngIf="userId" pButton pRipple type="button" class="p-button-raised" (click)="op.toggle($event); openChat()">
   <div [innerHtml]="popupText" style="width: 180px;">
 
   </div>
